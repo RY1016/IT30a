@@ -22,3 +22,9 @@ mysqldump -u root -p --databases library_db > "C:\dev\RY\IT30a\backups\%date:~-4
 %time:~3,2%_
 %time:~6,2%_
 library_db2.sql"
+
+Laboratory 2
+
+ALTER TABLE students ADD COLUMN student_created_at TIMESTAMP NULL DEFAULT NULL; --Creates a new table for a timestamp
+UPDATE students SET student_created_at = CURRENT_TIMESTAMP WHERE student_created_at IS NULL; --Updates the newly inserted value
+ALTER TABLE students MODIFY COLUMN  student_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP; --Automatically updates the timestamp for newly created value
