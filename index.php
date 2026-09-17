@@ -21,7 +21,29 @@ try {
 }
 
 
-//
+// Session
+session_start();
+
+//Determine the current Section
+$section = isset($_GET['section']) ?? 'students';
+
+//CRUD operations
+$section = $_GET['action'] ?? '';
+
+//----------------------------------------------
+// Students
+//----------------------------------------------
+
+//Fet students
+if ($section === 'students') {
+    $stmt = $pdo->query(
+        "SELECT *
+        FROM students
+         ORDER BY student_id DESC
+        ");
+    $students = $stmt->fetchAll();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -29,9 +51,56 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Library Systems</title>
 </head>
 <body>
-     <h1>Hello world</h1>
-</body>
-</html>
+     <h1>Simple Library Systems</h1>
+
+     <nav>
+        <a href="index.php?section=students">Students</a>
+        <a href="index.php?section=books">Books</a>
+        <a href="index.php?section=Borrows">Borrows</a>
+     </nav>
+     <hr>
+     <?php if ($section === 'students'): ?>
+        <h1>Students</h1>
+        <table border="1">
+            <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Course</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($students as $student): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars ($student['student_id']) ?></td>
+                                    <td><?= htmlspecialchars ($student['student_first_name']) ?></td>
+                                    <td><?= htmlspecialchars ($student['student_last_name']) ?></td>
+                                    <td><?= htmlspecialchars ($student['student_course']) ?></td>
+                                    <td><?= htmlspecialchars ($student['student_created_at']) ?></td>
+                                    <td>
+                                        <a>Edit</a>
+                                        <a>Delete</a>
+                                    </td>
+                                </tr>  
+            <?php endforeach; ?>
+            
+            </tbody>
+        </table>
+     <?php endif; ?>
+
+        <?php if ($section === 'students'): ?>
+            <h1>Students</h1>
+        <?php endif; ?>
+
+        <?php if ($section === 'books'):?>
+            <h1>Books</h1>
+        <?php endif; ?>
+        <?php if ($section === 'borrows'): ?>
+            <h1>Borrows</h1>
+        <?php endif; ?>
+    </body>
+</html> ]
