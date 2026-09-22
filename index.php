@@ -34,18 +34,47 @@
     // Students
     //----------------------------------------------
 
-
-    // Check current section
-echo "Current section: " . $section;
-
     //Fetch students
     if ($section === 'students') {
-        $stmt = $pdo->query(
-            "SELECT *
+        $stmt = $pdo->query("
+            SELECT *
             FROM students
             ORDER BY student_id DESC
             ");
         $students = $stmt->fetchAll();
+    }
+
+    //Create a new student
+    if ($section === 'students' && $action === 'create') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $first_name = $_POST['first_name'] ?? '';
+            $last_name = $_POST['last_name'] ?? '';
+            $course = $_POST['course'] ?? '';
+
+            if ($first_name && $last_name && $course !== '') {
+
+                $sql="
+                INSERT INTO students (
+                student_first_name, 
+                student_last_name, 
+                student_course) 
+                VALUES (?, ?, ?)";
+
+                $stmt = $pdo->prepare($sql);
+
+                $stmt->execute([
+                    $first_name,
+                    $last_name,
+                    $course
+                ]);
+
+                $_SESSION['alert'] = 'Student saved successfully.';
+
+                // Redirect to the students section after successful creation
+                header('Location: index.php?section=students');
+                exit;
+            }
+        }
     }
 
     ?>
@@ -68,7 +97,56 @@ echo "Current section: " . $section;
         <hr>
         <?php if ($section === 'students'): ?>
             <h1>Students</h1>
-            <table border="1">
+            <p>
+                <a href="index.php?section=students&action=create">
+                    Add New Student
+                </a>
+            </p>
+            <?php if ($action === 'create'): ?>
+                <h2>Add New Student</h2>
+
+                <form method="POST">
+                    <!-- Form fields for adding a new student -->
+                     <p>
+                        <label>First Name:</label>
+                        <br>
+                        <input type="text" 
+                        id="first_name" 
+                        name="first_name" 
+                        required
+                        />
+                     </p>
+
+                      <p>
+                        <label>Last Name:</label>
+                        <br>
+                        <input type="text" 
+                        id="last_name" 
+                        name="last_name" 
+                        required
+                        />
+                     </p>
+
+                      <p>
+                        <label>Course</label>
+                        <br>
+                        <input type="text" 
+                        id="course" 
+                        name="course" 
+                        required
+                        />
+                     </p>
+
+                    <button type="submit">
+                        Save
+                    </button>
+                    <a href = "index.php?section=students">
+                        Cancel
+                    </a>
+                </form>
+
+                <?php else: ?>
+<table border = '1'>
         <thead>
             <tr>
                 <th>ID</th>
@@ -98,7 +176,11 @@ echo "Current section: " . $section;
             <?php endforeach; ?>
         </tbody>
 
-    </table>
+</table>
+            <?php endif; ?>
+
+
+ 
         <?php endif; ?>
 
             <?php if ($section === 'students'): ?>
