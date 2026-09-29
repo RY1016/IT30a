@@ -77,6 +77,52 @@
         }
     }
 
+    //Update student
+    if ($section === 'students' && $action === 'update') {
+        $student_id = (int) ($_GET['id'] ?? 0);
+
+        // Retrieve Student Information
+        $stmt = $pdo->prepare("
+            SELECT *
+            FROM students
+            WHERE student_id = ?
+        ");
+        
+        $stmt->execute([$student_id]);
+        $student = $stmt->fetch();
+    
+        //Update Student Info
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $first_name = $_POST['first_name'] ?? '';
+            $last_name = $_POST['last_name'] ?? '';
+            $course = $_POST['course'] ?? '';
+
+            if ($first_name && $last_name && $course !== '') {
+
+                $sql="
+                UPDATE students
+                SET student_first_name = ?, 
+                    student_last_name = ?, 
+                    student_course = ?
+                WHERE student_id = ?";
+
+                $stmt = $pdo->prepare($sql);
+
+                $stmt->execute([
+                    $first_name,
+                    $last_name,
+                    $course,
+                    $student_id
+                ]);
+
+                $_SESSION['alert'] = 'Student updated successfully.';
+
+                // Redirect to the students section after successful update
+                header('Location: index.php?section=students');
+                exit;
+            }
+        }
+    }
     ?>
 
     <!DOCTYPE html>
@@ -104,17 +150,16 @@
             </p>
             <?php if ($action === 'create'): ?>
                 <h2>Add New Student</h2>
-
                 <form method="POST">
                     <!-- Form fields for adding a new student -->
                      <p>
                         <label>First Name:</label>
                         <br>
                         <input type="text" 
-                        id="first_name" 
-                        name="first_name" 
-                        required
-                        />
+                            id="first_name" 
+                            name="first_name" 
+                            required
+                            />
                      </p>
 
                       <p>
@@ -145,8 +190,53 @@
                     </a>
                 </form>
 
-                <?php else: ?>
-<table border = '1'>
+            <?php elseif ($action === 'update'): ?>
+                <h2>Update Student</h2>
+                <form method="POST">
+                    <!-- Form fields for adding a new student -->
+                     <p>
+                        <label>First Name:</label>
+                        <br>
+                        <input type="text" 
+                            id="first_name" 
+                            name="first_name" 
+                            value="<?= htmlspecialchars($student['student_first_name']) ?>"
+                            required
+                            />
+                     </p>
+
+                      <p>
+                        <label>Last Name:</label>
+                        <br>
+                        <input type="text" 
+                        id="last_name" 
+                        name="last_name" 
+                        value="<?= htmlspecialchars($student['student_last_name']) ?>"
+                        required
+                        />
+                     </p>
+
+                      <p>
+                        <label>Course</label>
+                        <br>
+                        <input type="text" 
+                        id="course" 
+                        name="course" 
+                        value="<?= htmlspecialchars($student['student_course']) ?>"
+                        required
+                        />
+                     </p>
+
+                    <button type="submit">
+                        Update
+                    </button>
+                    <a href = "index.php?section=students">
+                        Cancel
+                    </a>
+                </form>
+
+            <?php else: ?>
+<table>
         <thead>
             <tr>
                 <th>ID</th>
@@ -168,9 +258,9 @@
                     <td><?= htmlspecialchars($student['student_created_at']) ?></td>
 
                     <td>
-                        <a>Edit</a>
+                        <a href = "index.php?section=students&action=update&id=<?= $student['student_id'] ?>?>">Edit</a>
                         |
-                        <a>Delete</a>
+                        <a h>Delete</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -179,12 +269,9 @@
 </table>
             <?php endif; ?>
 
-
- 
-        <?php endif; ?>
+           <?php endif; ?>
 
             <?php if ($section === 'students'): ?>
-                
             <?php endif; ?>
 
             <?php if ($section === 'books'):?>
@@ -194,4 +281,13 @@
                 <h1>Borrows</h1>
             <?php endif; ?>
         </body>
+                <?php if (isset($_SESSION['alert'])): ?>
+                    <script>
+                        alert(<?=json_encode($_SESSION['alert'])?>);
+                    </script>
+
+                <?php unset($_SESSION['alert']); ?>
+
+                <?php endif; ?>
+
     </html> 
