@@ -480,7 +480,7 @@
                 </form>
 
             <?php else: ?>
-<table>
+<table border = '1'>
         <thead>
             <tr>
                 <th>ID</th>
@@ -623,7 +623,7 @@
 
     <?php else: ?>
 
-        <table>
+        <table border="1">
 
             <thead>
                 <tr>
@@ -778,7 +778,7 @@
 
     <?php else: ?>
 
-        <table>
+        <table border="1">
 
             <thead>
 
