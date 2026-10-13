@@ -231,46 +231,43 @@
     //Fetch Borrow Records
      if ($section === 'borrows') {
 
-                // Fetch Students for borrow form
-                $stmt = $pdo->query("
-                    SELECT
-                        student_id,
-                        student_first_name,
-                        student_last_name
-                    FROM students
-                    ORDER BY student_last_name, student_first_name
-                ");
+                //Fetch Borrow Records
+                if ($section === 'borrows') {
 
-                $students = $stmt->fetchAll();
+                    // Fetch Borrow Records
+                    $stmt = $pdo->query("
+                        SELECT
+                            borrows.borrow_id,
+                            borrows.student_id,
+                            students.student_first_name,
+                            students.student_last_name,
+                            borrows.book_id,
+                            books.book_title,
+                            borrows.borrow_date,
+                            borrows.borrow_return_date
+                        FROM borrows
+                        INNER JOIN students
+                            ON borrows.student_id = students.student_id
+                        INNER JOIN books
+                            ON borrows.book_id = books.book_id
+                        ORDER BY borrows.borrow_id DESC
+                    ");
 
+                    $borrows = $stmt->fetchAll();
 
-                // Fetch Books for borrow form
-                $stmt = $pdo->query("
-                    SELECT
-                        book_id,
-                        book_title,
-                        book_author
-                    FROM books
-                    ORDER BY book_title
-                ");
+                    // Fetch Books for borrow form
+                    $stmt = $pdo->query("
+                        SELECT
+                            book_id,
+                            book_title,
+                            book_author
+                        FROM books
+                        ORDER BY book_title
+                    ");
 
-                $books = $stmt->fetchAll();
-
-
-                // Fetch Borrow Records
-                $stmt = $pdo->query("
-                    SELECT
-                        borrow_id,
-                        student_id,
-                        book_id,
-                        borrow_date,
-                        borrow_return_date
-                    FROM borrows
-                    ORDER BY borrow_id DESC
-                ");
-
-                $borrows = $stmt->fetchAll();
-    }
+                    $books = $stmt->fetchAll();
+                }
+     }
     //Borrow A Book
     if ($section === 'borrows' && $action === 'create') {
      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -784,11 +781,12 @@
 
                 <tr>
                     <th>Borrow ID</th>
-                    <th>Student ID</th>
-                    <th>Book ID</th>
+                    <th>Student Name</th>
+                    <th>Book Title</th>
                     <th>Borrow Date</th>
                     <th>Book Return Date</th>
-                    <th>Actions</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
 
             </thead>
@@ -805,11 +803,11 @@
                         </td>
 
                         <td>
-                            <?= htmlspecialchars($borrow['student_id']) ?>
+                            <?= htmlspecialchars($borrow['student_first_name'] . ' ' . $borrow['student_last_name']) ?>
                         </td>
 
                         <td>
-                            <?= htmlspecialchars($borrow['book_id']) ?>
+                            <?= htmlspecialchars($borrow['book_title']) ?>
                         </td>
 
                         <td>
@@ -817,34 +815,29 @@
                         </td>
 
                         <td>
-
                             <?php if ($borrow['borrow_return_date'] === null): ?>
-
-                                Not Returned
-
+                                not Returned
                             <?php else: ?>
-
                                 <?= htmlspecialchars($borrow['borrow_return_date']) ?>
-
                             <?php endif; ?>
-
                         </td>
 
                         <td>
-
                             <?php if ($borrow['borrow_return_date'] === null): ?>
-
-                                <a href="index.php?section=borrows&action=update&id=<?= $borrow['borrow_id'] ?>">
-                                    Return Book
-                                </a>
-
+                                Borrowed
                             <?php else: ?>
-
                                 Returned
-
                             <?php endif; ?>
-
                         </td>
+
+                        <td>
+                            <?php if ($borrow['borrow_return_date'] === null): ?>
+                                <a href="index.php?section=borrows&action=update&id=<?= $borrow['borrow_id'] ?>">
+                                    Return
+                                </a>
+                            <?php endif; ?>
+                        </td>
+                        
 
                     </tr>
 
