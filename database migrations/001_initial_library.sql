@@ -81,10 +81,10 @@ INSERT INTO students (
     student_course
 )
 VALUES
-('Rica Jane', 'Novo', 'BSIT'),
-('XAVIER', 'ALIEN', 'BS-HUNTER'),
-('ZAYNE', 'SNOWMAN', 'MEDICAL/Cardiologist'),
-('RAFAYEL', 'FIRE', 'ARTIST');
+('Gojo', 'Satoro', 'JJK'),
+('ITACHI', 'UCHIHA', 'NINJA'),
+('KAKASHI', 'HATAKE', 'NINJA'),
+('Rimuru', 'Tempest', 'Mage');
 
 
 -- Insert Books
