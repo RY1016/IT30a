@@ -25,7 +25,7 @@
     session_start();
 
     //Determine the current Section
-    $section = $_GET['section'] ?? 'students';
+    $section = strtolower($_GET['section'] ?? 'students');
 
     //CRUD operations
     $action = $_GET['action'] ?? '';
@@ -374,12 +374,11 @@
         <title>Library Systems</title>
     </head>
 <body>
-        <h1>Simple Library Systems</h1>
-
+        <h1>Simple Library System</h1>
         <nav>
             <a href="index.php?section=students">Students</a>
             <a href="index.php?section=books">Books</a>
-            <a href="index.php?section=borrows">Borrows</a>
+            <a href="index.php?section=borrow">Borrow</a>
         </nav>
         <hr>
         <?php if ($section === 'students'): ?>
