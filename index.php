@@ -26,6 +26,9 @@
 
     //Determine the current Section
     $section = strtolower($_GET['section'] ?? 'students');
+    if ($section === 'borrow') {
+        $section = 'borrows';
+    }
 
     //CRUD operations
     $action = $_GET['action'] ?? '';
@@ -229,45 +232,53 @@
     //--------------------
 
     //Fetch Borrow Records
-     if ($section === 'borrows') {
+    if ($section === 'borrows') {
 
-                //Fetch Borrow Records
-                if ($section === 'borrows') {
+        // Fetch Borrow Records
+        $stmt = $pdo->query("
+            SELECT
+                borrows.borrow_id,
+                borrows.student_id,
+                students.student_first_name,
+                students.student_last_name,
+                borrows.book_id,
+                books.book_title,
+                borrows.borrow_date,
+                borrows.borrow_return_date
+            FROM borrows
+            INNER JOIN students
+                ON borrows.student_id = students.student_id
+            INNER JOIN books
+                ON borrows.book_id = books.book_id
+            ORDER BY borrows.borrow_id DESC
+        ");
 
-                    // Fetch Borrow Records
-                    $stmt = $pdo->query("
-                        SELECT
-                            borrows.borrow_id,
-                            borrows.student_id,
-                            students.student_first_name,
-                            students.student_last_name,
-                            borrows.book_id,
-                            books.book_title,
-                            borrows.borrow_date,
-                            borrows.borrow_return_date
-                        FROM borrows
-                        INNER JOIN students
-                            ON borrows.student_id = students.student_id
-                        INNER JOIN books
-                            ON borrows.book_id = books.book_id
-                        ORDER BY borrows.borrow_id DESC
-                    ");
+        $borrows = $stmt->fetchAll();
 
-                    $borrows = $stmt->fetchAll();
+        // Fetch Books for borrow form
+        $stmt = $pdo->query("
+            SELECT
+                book_id,
+                book_title,
+                book_author
+            FROM books
+            ORDER BY book_title
+        ");
 
-                    // Fetch Books for borrow form
-                    $stmt = $pdo->query("
-                        SELECT
-                            book_id,
-                            book_title,
-                            book_author
-                        FROM books
-                        ORDER BY book_title
-                    ");
+        $books = $stmt->fetchAll();
 
-                    $books = $stmt->fetchAll();
-                }
-     }
+        // Fetch Students for borrow form
+        $stmt = $pdo->query("
+            SELECT
+                student_id,
+                student_first_name,
+                student_last_name
+            FROM students
+            ORDER BY student_first_name
+        ");
+
+        $students = $stmt->fetchAll();
+    }
     //Borrow A Book
     if ($section === 'borrows' && $action === 'create') {
      if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -378,7 +389,7 @@
         <nav>
             <a href="index.php?section=students">Students</a>
             <a href="index.php?section=books">Books</a>
-            <a href="index.php?section=borrow">Borrow</a>
+            <a href="index.php?section=borrows">Borrow</a>
         </nav>
         <hr>
         <?php if ($section === 'students'): ?>
